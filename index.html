@@ -37,18 +37,23 @@
         }
 
         function render() {
-            var duration;
+            var duration = moment.utc(origin ? Date.now() - origin : offset).format('H:mm:ss.SSS');
             if (origin) {
-                duration = Date.now() - origin;
+                document.title = 'Running | Persistable Stopwatch';
                 startOrStopHTMLButtonElement.title = 'Pause';
                 startOrStopHTMLButtonElement.innerText = 'pause';
                 requestAnimationFrame(render);
             } else {
-                duration = offset;
-                startOrStopHTMLButtonElement.title = duration ? 'Resume' : 'Start';
+                if (offset) {
+                    document.title = duration + ' | Persistable Stopwatch';
+                    startOrStopHTMLButtonElement.title = 'Resume';
+                } else {
+                    document.title = 'Persistable Stopwatch';
+                    startOrStopHTMLButtonElement.title = 'Start';
+                }
                 startOrStopHTMLButtonElement.innerText = 'play_arrow';
             }
-            durationHTMLOutputElement.innerText = moment.utc(duration).format('H:mm:ss.SSS');
+            durationHTMLOutputElement.innerText = duration;
         }
 
         load(location);
@@ -62,12 +67,10 @@
                 offset = Date.now() - origin;
                 origin = undefined;
                 history.pushState({ offset }, 'Running', location.pathname + '?offset=' + offset);
-                document.title = moment.utc(offset).format('H:mm:ss.SSS') + ' | Persistable Stopwatch';
             } else {
                 origin = Date.now() - offset;
                 offset = undefined;
                 history.pushState({ offset }, 'Paused', location.pathname + '?origin=' + origin);
-                document.title = 'Running | Persistable Stopwatch';
                 render();
             }
         });
@@ -76,7 +79,6 @@
             origin = undefined;
             offset = 0;
             history.pushState({ offset }, 'Rady', location.pathname);
-            document.title = 'Persistable Stopwatch';
             render();
         });
     </script>
