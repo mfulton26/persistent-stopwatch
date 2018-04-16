@@ -4,11 +4,33 @@
 <head>
     <base target="_top">
     <title>Persistable Stopwatch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
     <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        html {
+            display: table;
+            margin: auto;
+        }
+
+        body {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+        }
+
         #duration {
-            font-family: 'Courier New', Courier, monospace
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 10vmax;
+        }
+
+        .material-icons {
+            font-size: 7vmax;
         }
     </style>
 </head>
@@ -18,8 +40,8 @@
         <output id="duration"></output>
     </div>
     <div>
+        <button id="reset" class="material-icons" title="Reset">refresh</button>
         <button id="startOrStop" class="material-icons" autofocus></button>
-        <button id="reset" class="material-icons">restore</button>
     </div>
     <script>
         var durationHTMLOutputElement = document.getElementById('duration');
@@ -31,29 +53,41 @@
 
         function load(location) {
             var params = new URLSearchParams(location.search);
-            origin = Number(params.get('origin'));
-            offset = Number(params.get('offset')) || 0;
+            origin = params.has('origin') ? Number(params.get('origin')) : undefined;
+            offset = params.has('offset') ? Number(params.get('offset')) : undefined;
             render();
         }
 
         function render() {
-            var duration = moment.utc(origin ? Date.now() - origin : offset).format('H:mm:ss.SSS');
-            if (origin) {
-                document.title = 'Running | Persistable Stopwatch';
-                startOrStopHTMLButtonElement.title = 'Pause';
-                startOrStopHTMLButtonElement.innerText = 'pause';
-                requestAnimationFrame(render);
-            } else {
-                if (offset) {
-                    document.title = duration + ' | Persistable Stopwatch';
-                    startOrStopHTMLButtonElement.title = 'Resume';
-                } else {
+            function millisecondsToDurationString(milliseconds) {
+                return Math.floor(milliseconds / 3600000) + ':' + new Date(milliseconds).toISOString().substr(14, 9);
+            }
+            var duration = millisecondsToDurationString(offset || 0);
+            durationHTMLOutputElement.innerText = millisecondsToDurationString(offset || 0);
+            if (origin === undefined) {
+                if (offset === undefined) {
                     document.title = 'Persistable Stopwatch';
+                    resetHTMLButtonElement.disabled = true;
                     startOrStopHTMLButtonElement.title = 'Start';
+                } else {
+                    document.title = duration + ' | Persistable Stopwatch';
+                    resetHTMLButtonElement.disabled = false;
+                    startOrStopHTMLButtonElement.title = 'Resume';
                 }
                 startOrStopHTMLButtonElement.innerText = 'play_arrow';
+            } else {
+                document.title = 'Running | Persistable Stopwatch';
+                resetHTMLButtonElement.disabled = false;
+                startOrStopHTMLButtonElement.title = 'Pause';
+                startOrStopHTMLButtonElement.innerText = 'pause';
+                (function update() {
+                    if (origin === undefined) {
+                        return;
+                    }
+                    durationHTMLOutputElement.innerText = millisecondsToDurationString(Date.now() - origin);
+                    requestAnimationFrame(update);
+                })();
             }
-            durationHTMLOutputElement.innerText = duration;
         }
 
         load(location);
@@ -63,22 +97,22 @@
         };
 
         startOrStopHTMLButtonElement.addEventListener('click', function () {
-            if (origin) {
+            if (origin === undefined) {
+                origin = Date.now() - (offset || 0);
+                offset = undefined;
+                history.pushState({ offset }, 'Paused', location.pathname + '?origin=' + origin);
+            } else {
                 offset = Date.now() - origin;
                 origin = undefined;
                 history.pushState({ offset }, 'Running', location.pathname + '?offset=' + offset);
-            } else {
-                origin = Date.now() - offset;
-                offset = undefined;
-                history.pushState({ offset }, 'Paused', location.pathname + '?origin=' + origin);
-                render();
             }
+            render();
         });
 
         resetHTMLButtonElement.addEventListener('click', function () {
             origin = undefined;
-            offset = 0;
-            history.pushState({ offset }, 'Rady', location.pathname);
+            offset = undefined;
+            history.pushState({ offset }, 'Ready', location.pathname);
             render();
         });
     </script>
