@@ -80,7 +80,21 @@
           } else {
             params.delete("offset");
           }
-          location.search = params.toString();
+          if ("origin" in localStorage) {
+            const origin = Number(localStorage.getItem("origin"));
+            history.replaceState(
+              { origin },
+              origin === 0 ? "Unstarted" : "Stopped",
+              `${location.pathname}?origin=${origin}`
+            );
+          } else {
+            const offset = Number(localStorage.getItem("offset"));
+            history.replaceState(
+              { offset },
+              "Running",
+              `${location.pathname}?offset=${offset}`
+            );
+          }
         }
         render();
       }
