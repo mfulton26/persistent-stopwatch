@@ -70,10 +70,12 @@
           document.title = `${duration} | Persistable Stopwatch`;
           startOrStopButton.title = "Start";
           startOrStopButton.innerText = "play_arrow";
+          resetButton.disabled = offset === undefined;
         } else {
           document.title = "Running | Persistable Stopwatch";
           startOrStopButton.title = "Stop";
           startOrStopButton.innerText = "stop";
+          resetButton.disabled = false;
           animate();
         }
       }
