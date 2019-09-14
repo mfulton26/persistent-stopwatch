@@ -16,7 +16,9 @@ self.addEventListener("install", function(event) {
 
 self.addEventListener("fetch", function(event) {
   async function fetchResource(request) {
-    const responseFromCache = await caches.match(event.request);
+    const responseFromCache = await caches.match(event.request, {
+      ignoreSearch: true
+    });
     return responseFromCache || fetch(request);
   }
   event.respondWith(fetchResource(event.request));
