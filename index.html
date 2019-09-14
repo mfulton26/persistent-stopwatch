@@ -79,12 +79,11 @@
           if (offset === undefined) {
             document.title = "Persistable Stopwatch";
             resetHTMLButtonElement.disabled = true;
-            startOrStopHTMLButtonElement.title = "Start";
           } else {
             document.title = duration + " | Persistable Stopwatch";
             resetHTMLButtonElement.disabled = false;
-            startOrStopHTMLButtonElement.title = "Resume";
           }
+          startOrStopHTMLButtonElement.title = "Start";
           startOrStopHTMLButtonElement.innerText = "play_arrow";
         } else {
           document.title = "Running | Persistable Stopwatch";
