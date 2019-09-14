@@ -57,7 +57,7 @@
       const resetButton = document.getElementById("reset");
 
       function load(location) {
-        const params = new URLSearchParams(location.hash.slice(1));
+        const params = new URLSearchParams(location.search);
         if (params.has("origin") || params.has("offset")) {
           if (params.has("origin")) {
             localStorage.setItem("origin", params.get("origin"));
@@ -80,7 +80,7 @@
           } else {
             params.delete("offset");
           }
-          location.hash = params.toString();
+          location.search = params.toString();
         }
         render();
       }
@@ -130,7 +130,7 @@
             history.pushState(
               { offset },
               "Running",
-              `${location.pathname}#offset=${offset}`
+              `${location.pathname}?offset=${offset}`
             );
           } else {
             const origin = Date.now() - Number(localStorage.getItem("offset"));
@@ -139,7 +139,7 @@
             history.pushState(
               { origin },
               "Stopped",
-              `${location.pathname}#origin=${origin}`
+              `${location.pathname}?origin=${origin}`
             );
           }
         }
@@ -155,7 +155,7 @@
           history.pushState(
             { offset },
             "Unstarted",
-            `${location.pathname}#offset=${offset}`
+            `${location.pathname}?offset=${offset}`
           );
         }
       );
