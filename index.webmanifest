@@ -2,7 +2,6 @@
   "name": "Persistent Stopwatch",
   "short_name": "persistent-stopwatch",
   "description": "Shareable, persistent stopwatch. You can reload the page, share the URL, etc. All state is managed client-side.",
-  "start_url": "/persistent-stopwatch/",
   "display": "standalone",
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
