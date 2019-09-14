@@ -36,7 +36,6 @@
       }
     </style>
   </head>
-
   <body>
     <div>
       <output id="duration"></output>
@@ -90,8 +89,8 @@
         } else {
           document.title = "Running | Persistable Stopwatch";
           resetHTMLButtonElement.disabled = false;
-          startOrStopHTMLButtonElement.title = "Pause";
-          startOrStopHTMLButtonElement.innerText = "pause";
+          startOrStopHTMLButtonElement.title = "Stop";
+          startOrStopHTMLButtonElement.innerText = "stop";
           (function update() {
             if (origin === undefined) {
               return;
@@ -116,7 +115,7 @@
           offset = undefined;
           history.pushState(
             { offset },
-            "Paused",
+            "Stopped",
             location.pathname + "?origin=" + origin
           );
         } else {
