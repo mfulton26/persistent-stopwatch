@@ -56,44 +56,60 @@
       const startOrStopButton = document.getElementById("startOrStop");
       const resetButton = document.getElementById("reset");
 
-      let origin;
-      let offset;
-
       function load(location) {
         const params = new URLSearchParams(location.search);
-        origin = params.has("origin")
-          ? Number(params.get("origin"))
-          : undefined;
-        offset = params.has("offset")
-          ? Number(params.get("offset"))
-          : undefined;
+        if (params.has("origin") || params.has("offset")) {
+          if (params.has("origin")) {
+            localStorage.setItem("origin", params.get("origin"));
+          } else {
+            localStorage.removeItem("origin");
+          }
+          if (params.has("offset")) {
+            localStorage.setItem("offset", params.get("offset"));
+          } else {
+            localStorage.removeItem("offset");
+          }
+        } else if ("origin" in localStorage || "offset" in localStorage) {
+          if ("origin" in localStorage) {
+            params.set("origin", localStorage.getItem("origin"));
+          } else {
+            params.delete("origin");
+          }
+          if ("offset" in localStorage) {
+            params.set("offset", localStorage.getItem("offset"));
+          } else {
+            params.delete("offset");
+          }
+          location.search = params.toString();
+        }
         render();
       }
 
       function render() {
-        const duration = millisecondsToDurationString(offset || 0);
+        const offset = Number(localStorage.getItem("offset"));
+        const duration = millisecondsToDurationString(offset);
         durationOutput.innerText = duration;
-        if (origin === undefined) {
-          document.title = `${duration} | Persistable Stopwatch`;
-          startOrStopButton.title = "Start";
-          startOrStopButton.innerText = "play_arrow";
-          resetButton.disabled = offset === undefined;
-        } else {
+        if ("origin" in localStorage) {
           document.title = "Running | Persistable Stopwatch";
           startOrStopButton.title = "Stop";
           startOrStopButton.innerText = "stop";
           resetButton.disabled = false;
           animate();
+        } else {
+          document.title = `${duration} | Persistable Stopwatch`;
+          startOrStopButton.title = "Start";
+          startOrStopButton.innerText = "play_arrow";
+          resetButton.disabled = offset === undefined;
         }
       }
 
       function animate() {
-        if (origin === undefined) {
-          return;
+        if ("origin" in localStorage) {
+          const origin = Number(localStorage.getItem("origin"));
+          const duration = millisecondsToDurationString(Date.now() - origin);
+          durationOutput.innerText = duration;
+          requestAnimationFrame(animate);
         }
-        const duration = millisecondsToDurationString(Date.now() - origin);
-        durationOutput.innerText = duration;
-        requestAnimationFrame(animate);
       }
 
       function millisecondsToDurationString(milliseconds) {
@@ -107,21 +123,23 @@
       startOrStopButton.addEventListener(
         "click",
         function pushStartOrStopHistoryState() {
-          if (origin === undefined) {
-            origin = Date.now() - (offset || 0);
-            offset = undefined;
-            history.pushState(
-              { offset },
-              "Stopped",
-              `${location.pathname}?origin=${origin}`
-            );
-          } else {
-            offset = Date.now() - origin;
-            origin = undefined;
+          if ("origin" in localStorage) {
+            const offset = Date.now() - Number(localStorage.getItem("origin"));
+            localStorage.setItem("offset", offset);
+            localStorage.removeItem("origin");
             history.pushState(
               { offset },
               "Running",
               `${location.pathname}?offset=${offset}`
+            );
+          } else {
+            const origin = Date.now() - Number(localStorage.getItem("offset"));
+            localStorage.setItem("origin", origin);
+            localStorage.removeItem("offset");
+            history.pushState(
+              { origin },
+              "Stopped",
+              `${location.pathname}?origin=${origin}`
             );
           }
         }
@@ -131,9 +149,14 @@
       resetButton.addEventListener(
         "click",
         function pushUnstartedHistoryState() {
-          origin = undefined;
-          offset = undefined;
-          history.pushState({ offset }, "Unstarted", location.pathname);
+          const offset = 0;
+          localStorage.setItem("offset", offset);
+          localStorage.removeItem("origin");
+          history.pushState(
+            { offset },
+            "Unstarted",
+            `${location.pathname}?offset=${offset}`
+          );
         }
       );
       resetButton.addEventListener("click", render);
