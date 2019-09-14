@@ -4,7 +4,8 @@
     <base target="_top" />
     <title>Persistable Stopwatch</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="manifest" href="/persistent-stopwatch/index.webmanifest" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="manifest" href="index.webmanifest" />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
@@ -36,6 +37,11 @@
         font-size: 7vmax;
       }
     </style>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+      }
+    </script>
   </head>
   <body>
     <div>
