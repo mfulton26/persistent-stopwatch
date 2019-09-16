@@ -1,7 +1,7 @@
 self.addEventListener("install", function(event) {
   async function installResources() {
     const urlsToCache = [
-      self.location.pathname.replace(/sw\.js$/, ""),
+      ".",
       "index.html",
       "icons/baseline_timer_black_24px.svg",
       "icons/baseline_timer_black_18.png",
