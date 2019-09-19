@@ -33,9 +33,18 @@
         text-align: center;
       }
 
+      .display,
+      .controls {
+        margin: 0.5vmax 3.5vmax;
+      }
+
       #duration {
         font-family: "Courier New", Courier, monospace;
         font-weight: bold;
+      }
+
+      .material-icons {
+        font-size: 7vmax;
       }
     </style>
     <script>
@@ -45,10 +54,10 @@
     </script>
   </head>
   <body>
-    <svg viewBox="-78 -8 156 16" xmlns="http://www.w3.org/2000/svg">
+    <svg class="display" viewBox="-78 -8 156 16" xmlns="http://www.w3.org/2000/svg">
       <text id="duration" x="0" y="0"></text>
     </svg>
-    <div>
+    <div class="controls">
       <button id="startOrStop" class="material-icons" autofocus></button>
       <button id="undo" class="material-icons" title="Undo">undo</button>
       <button id="redo" class="material-icons" title="Redo">redo</button>

@@ -1,3 +1,5 @@
+const version = "2";
+
 self.addEventListener("install", function(event) {
   async function installResources() {
     const urlsToCache = [
@@ -9,7 +11,7 @@ self.addEventListener("install", function(event) {
       "icons/baseline_timer_black_36.png",
       "icons/baseline_timer_black_48.png"
     ];
-    const cache = await caches.open("sw-cache");
+    const cache = await caches.open(`app-cache-v${version}`);
     await cache.addAll(urlsToCache);
   }
   event.waitUntil(installResources());
