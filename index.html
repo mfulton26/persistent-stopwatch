@@ -3,7 +3,10 @@
   <head>
     <base target="_top" />
     <title>Persistable Stopwatch</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <meta name="theme-color" content="#ffffff" />
     <link rel="manifest" href="index.webmanifest" />
     <link
@@ -13,6 +16,10 @@
     />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -39,23 +46,25 @@
       }
 
       #duration {
-        font-family: "Courier New", Courier, monospace;
+        font-family: "Roboto Mono", "Courier New", Courier, monospace;
         font-weight: bold;
       }
 
-      .material-icons {
-        font-size: 7vmax;
+      @media screen and (min-width: 800px) {
+        .material-icons {
+          font-size: 7vmax;
+        }
       }
     </style>
     <script>
-      if ("serviceWorker" in navigator) {
+      if (location.protocol === "https:" && "serviceWorker" in navigator) {
         navigator.serviceWorker.register("sw.js");
       }
     </script>
   </head>
   <body>
-    <svg class="display" viewBox="-78 -8 156 16" xmlns="http://www.w3.org/2000/svg">
-      <text id="duration" x="0" y="0"></text>
+    <svg class="display" xmlns="http://www.w3.org/2000/svg">
+      <text id="duration" x="0" y="0">00:00:00.000</text>
     </svg>
     <div class="controls">
       <button id="startOrStop" class="material-icons" autofocus></button>
@@ -72,7 +81,7 @@
       const redoButton = document.getElementById("redo");
       const resetButton = document.getElementById("reset");
 
-      function load(location) {
+      function load() {
         const params = new URLSearchParams(location.hash.slice(1));
         if (params.has("origin") || params.has("offset")) {
           if (params.has("origin")) {
@@ -118,12 +127,15 @@
 
       function renderDuration(duration) {
         svgText.textContent = duration;
-        const { x, y, width, height } = svgText.getBBox();
-        const baseVal = svg.viewBox.baseVal;
-        baseVal.x = x;
-        baseVal.y = y;
-        baseVal.width = width;
-        baseVal.height = height;
+        if (duration.length != this.previousDurationLength) {
+          const { x, y, width, height } = svgText.getBBox();
+          const baseVal = svg.viewBox.baseVal;
+          baseVal.x = x;
+          baseVal.y = y;
+          baseVal.width = width;
+          baseVal.height = height;
+          this.previousDurationLength = duration.length;
+        }
       }
 
       function render() {
@@ -219,11 +231,10 @@
       );
       resetButton.addEventListener("click", render);
 
-      load(location);
-
-      addEventListener("popstate", function(event) {
-        load(location);
-      });
+      load();
+      addEventListener("DOMContentLoaded", load);
+      addEventListener("load", load);
+      addEventListener("popstate", load);
     </script>
   </body>
 </html>
